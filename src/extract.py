@@ -16,7 +16,6 @@ DATA_DIR = BASE_DIR / "data" / "raw"
 # TODO: Documentar hallazgos
 '''
 
-# TODO: Cargar el CSV y entender la estructura  
 
 def extract_csv():
     
@@ -57,5 +56,6 @@ if __name__ == '__main__':
     df = extract_csv()
     if df is not None:
         print("\n✓ Extracción completada exitosamente\n")
+        print("===" * 30)
 
 
