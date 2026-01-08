@@ -51,11 +51,6 @@ def extract_csv():
     Identifique los tipos de datos y es necesario cambiar el tipo de dato.
 '''
 
-if __name__ == '__main__':
 
-    df = extract_csv()
-    if df is not None:
-        print("\n✓ Extracción completada exitosamente\n")
-        print("===" * 30)
 
 
