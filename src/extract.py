@@ -5,7 +5,7 @@ from pathlib import Path
 
 #=== IMPORTS ===#
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data" / "raw"
+DATA_DIR = BASE_DIR / "data" / "raw" #Ruta del CSV
 #===============#
 
 '''
@@ -48,7 +48,7 @@ def extract_csv():
 
 '''
     No hay datos nulos o duplicados en el archivo superstore.csv
-    Identifique los tipos de datos y es necesario cambiar el tipo de dato.
+    He identificado los tipos de datos y es necesario cambiar el tipo de dato.
 '''
 
 
