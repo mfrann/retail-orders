@@ -3,7 +3,8 @@ from extract import extract_csv
 from transform import (
     change_datatype,
     create_dim_products,
-    create_dim_customers
+    create_dim_customers, 
+    create_dim_locations
 )
 #===============#
 
@@ -41,8 +42,19 @@ def run_app():
     print(f"\n Hay nulos?: {dim_customers.isnull().sum().sum()}")
 
 
+    # - Crear dimension de lugar
+    print('\nDIMENSION DE LUGAR\n')
+    dim_locations = create_dim_locations(df_retail)
+    # Validar resultados
+    print(f'\n Total lugares únicos: {len(dim_locations)}')
+    print(f"\n Primeras 5 filas:\n{dim_locations.head()}")
+    print(f"\n Últimas 5 filas:\n{dim_locations.tail()}") 
+    print(f'\n [location_key] únicos: {dim_locations['location_key'].is_unique}')
+    print(f'\n Regiones únicos: {dim_locations['Region'].value_counts()}')
+    print(f'\n Países únicos:\n{dim_locations['Country'].unique()}')
+    print(f'\n Combinaciones City+State+Postal únicas: {dim_locations[['City', 'State', 'Postal Code']].duplicated().sum()}')
 
-
+    
 
     return df_retail
 

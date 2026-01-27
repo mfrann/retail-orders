@@ -56,7 +56,7 @@ def create_dim_customers(df):
     print('Columnas seleccionadas')
 
     # -- Eliminar filas duplicadas 
-    df_customers = df_customers.drop_duplicates(subset=['Customer ID'])
+    df_customers = df_customers.drop_duplicates(subset=['Customer ID']) # -> No es necesario, pero se evita un error.
     print('Filas duplicadas eliminadas')
 
     # -- Resetear indice
@@ -71,3 +71,33 @@ def create_dim_customers(df):
     df_customers = df_customers[['customer_key', 'Customer ID', 'Customer Name', 'Segment']]
 
     return df_customers
+
+# TODO: Crear dimension de lugar
+def create_dim_locations(df):
+
+    #? -- Objetivo: Crear una tabla con las ubicaciones unicas del dataset.
+
+    # -- Seleccionar las columnas 
+    df_locations = df[['Country', 'Region', 'State', 'City', 'Postal Code']]
+    print('Columnas seleccionadas')
+
+    # -- Eliminar filas duplicadas
+    df_locations = df_locations.drop_duplicates()
+    print('Filas duplicadas eliminadas')
+
+    # -- Resetear indice
+    df_locations = df_locations.reset_index(drop=True)
+    print('Indice Reseteado')
+
+    # -- Crear columna 'customer_key'
+    df_locations['location_key'] = range(len(df_locations))
+    print('Nueva columna creada')
+
+    # -- Reordenar columnas
+    df_locations = df_locations[['location_key', 'Country', 'Region', 'State', 'City', 'Postal Code']]
+
+    return df_locations
+
+# TODO: Crear dimension de modo de envio
+# TODO: Crear dimension de fecha
+# TODO: Crear dimension de fact_sales
