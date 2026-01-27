@@ -21,17 +21,53 @@ def change_datatype(df):
     print(f'\nTabla actualizada:\n {df.dtypes}\n')
     return df
 
+    #Se ha cambiado los tipos de datos de las columnas Order Date y Ship Date a datatime.
+
 # TODO: Crear dimension de productos
 def create_dim_products(df):
     # -- Seleccionar las columnas
-    df_productos = df[['Product ID', 'Product Name', 'Category', 'Subcategory']]
+    df_products = df[['Product ID', 'Product Name', 'Category', 'Sub-Category']]
     print('Columnas seleccionadas')
+
     # -- Eliminar filas duplicadas
-    df_productos = df_productos.drop_duplicates()
+    df_products = df_products.drop_duplicates()
     print('Filas duplicadas eliminadas')
-    # -- Crear nueva columna product_key
-    df['product_key'] = range(len(df))
-    print('Nueva columna creada')
+
     # -- Resetar el indice 
-    df_productos = df_productos.reset_index(drop=True)
+    df_products = df_products.reset_index(drop=True)
     print('Indice Reseteado')
+
+    # -- Crear nueva columna product_key
+    df_products['product_key'] = range(len(df_products)) # -> Crea la columna nueva y añade los indices. 
+    print('Nueva columna creada')
+
+    # -- Reordenar columnas
+    df_products = df_products[['product_key', 'Product ID', 'Product Name', 'Category', 'Sub-Category']]
+    
+    return df_products
+
+# TODO: Crear dimension de clientes
+def create_dim_customers(df):
+
+    #? -- Objetivo: Crear una tabla con clientes unicos del dataset. 
+
+    # -- Seleccionar las columnas
+    df_customers = df[['Customer ID', 'Customer Name', 'Segment']]
+    print('Columnas seleccionadas')
+
+    # -- Eliminar filas duplicadas 
+    df_customers = df_customers.drop_duplicates(subset=['Customer ID'])
+    print('Filas duplicadas eliminadas')
+
+    # -- Resetear indice
+    df_customers = df_customers.reset_index(drop=True)
+    print('Indice Reseteado')
+
+    # -- Crear columna 'customer_key'
+    df_customers['customer_key'] = range(len(df_customers))
+    print('Nueva columna creada')
+
+    # -- Reordenar columnas
+    df_customers = df_customers[['customer_key', 'Customer ID', 'Customer Name', 'Segment']]
+
+    return df_customers
