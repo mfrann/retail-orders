@@ -1,5 +1,6 @@
 #=== LIBRERIAS ===#
 import pandas as pd
+import logging as log
 #=================#
 
 '''
@@ -25,73 +26,103 @@ def change_datatype(df):
 
 # TODO: Crear dimension de productos
 def create_dim_products(df):
-    # -- Seleccionar las columnas
-    df_products = df[['Product ID', 'Product Name', 'Category', 'Sub-Category']]
+    try:
+        #? -- Objetivo: Crear una tabla con los productos unicos del dataset.
 
-    # -- Eliminar filas duplicadas
-    df_products = df_products.drop_duplicates()
+        if df is None:
+            raise ValueError('DataFrame es None')
+        # -- Seleccionar las columnas
+        df_products = df[['Product ID', 'Product Name', 'Category', 'Sub-Category']]
 
-    # -- Resetar el indice 
-    df_products = df_products.reset_index(drop=True)
+        # -- Eliminar filas duplicadas
+        df_products = df_products.drop_duplicates()
 
-    # -- Crear nueva columna product_key
-    df_products['product_key'] = range(len(df_products)) # -> Crea la columna nueva y añade los indices. 
+        # -- Resetar el indice 
+        df_products = df_products.reset_index(drop=True)
 
-    # -- Reordenar columnas
-    df_products = df_products[['product_key', 'Product ID', 'Product Name', 'Category', 'Sub-Category']]
+        # -- Crear nueva columna product_key
+        df_products['product_key'] = range(len(df_products)) # -> Crea la columna nueva y añade los indices. 
+
+        # -- Reordenar columnas
+        df_products = df_products[['product_key', 'Product ID', 'Product Name', 'Category', 'Sub-Category']]
+    
+    except KeyError as e:
+        log.error(f'Columna no encontrada: {e}')
+        return None
+    except Exception as e:
+        log.error(f'Error en create_dim_products')
+        return None
     
     return df_products
 
 # TODO: Crear dimension de clientes
 def create_dim_customers(df):
+    try:
+        #? -- Objetivo: Crear una tabla con clientes unicos del dataset. 
+        if df is None:
+            raise ValueError('DataFrame es None')
+        # -- Seleccionar las columnas
+        df_customers = df[['Customer ID', 'Customer Name', 'Segment']]
 
-    #? -- Objetivo: Crear una tabla con clientes unicos del dataset. 
+        # -- Eliminar filas duplicadas 
+        df_customers = df_customers.drop_duplicates(subset=['Customer ID']) # -> No es necesario, pero se evita un error.
 
-    # -- Seleccionar las columnas
-    df_customers = df[['Customer ID', 'Customer Name', 'Segment']]
+        # -- Resetear indice
+        df_customers = df_customers.reset_index(drop=True)
 
-    # -- Eliminar filas duplicadas 
-    df_customers = df_customers.drop_duplicates(subset=['Customer ID']) # -> No es necesario, pero se evita un error.
+        # -- Crear columna 'customer_key'
+        df_customers['customer_key'] = range(len(df_customers))
 
-    # -- Resetear indice
-    df_customers = df_customers.reset_index(drop=True)
+        # -- Reordenar columnas
+        df_customers = df_customers[['customer_key', 'Customer ID', 'Customer Name', 'Segment']]
 
-    # -- Crear columna 'customer_key'
-    df_customers['customer_key'] = range(len(df_customers))
-
-    # -- Reordenar columnas
-    df_customers = df_customers[['customer_key', 'Customer ID', 'Customer Name', 'Segment']]
-
+    except KeyError as e:
+        log.error(f'Columna no encontrada: {e}')
+        return None
+    except Exception as e:
+        log.error(f'Error en create_dim_customers')
+        return None
+    
     return df_customers
 
 # TODO: Crear dimension de lugar
 def create_dim_locations(df):
+    try:
+        #? -- Objetivo: Crear una tabla con los lugares unicos del dataset.
 
-    #? -- Objetivo: Crear una tabla con las ubicaciones unicas del dataset.
+        if df is None:
+            raise ValueError('DataFrame es None')
+        # -- Seleccionar las columnas 
+        df_locations = df[['Country', 'Region', 'State', 'City', 'Postal Code']]
 
-    # -- Seleccionar las columnas 
-    df_locations = df[['Country', 'Region', 'State', 'City', 'Postal Code']]
+        # -- Eliminar filas duplicadas
+        df_locations = df_locations.drop_duplicates()
 
-    # -- Eliminar filas duplicadas
-    df_locations = df_locations.drop_duplicates()
+        # -- Resetear indice
+        df_locations = df_locations.reset_index(drop=True)
 
-    # -- Resetear indice
-    df_locations = df_locations.reset_index(drop=True)
+        # -- Crear columna 'customer_key'
+        df_locations['location_key'] = range(len(df_locations))
 
-    # -- Crear columna 'customer_key'
-    df_locations['location_key'] = range(len(df_locations))
-
-    # -- Reordenar columnas
-    df_locations = df_locations[['location_key', 'Country', 'Region', 'State', 'City', 'Postal Code']]
-
+        # -- Reordenar columnas
+        df_locations = df_locations[['location_key', 'Country', 'Region', 'State', 'City', 'Postal Code']]
+    
+    except KeyError as e:
+        log.error(f'Columna no encontrada: {e}')
+        return None
+    except Exception as e:
+        log.error(f'Error en create_dim_locations')
+        return None
+    
     return df_locations
 
 # TODO: Crear dimension de modo de envio
 def create_dim_ship(df):
     try:
-
         #? -- Objetivo: Crear una tabla con los envios unicos del dataset.
 
+        if df is None:
+            raise ValueError('DataFrame es None')
         # -- Seleccionar las columnas
         df_ship = df[['Ship Mode']]
 
@@ -106,11 +137,31 @@ def create_dim_ship(df):
 
         # -- Reordenar columnas 
         df_ship = df_ship[['ship_mode_key', 'Ship Mode']]
-    except FileNotFoundError as e:
-        print(f'Hubo un error: {e}')
-        return False
+    
+    except KeyError as e:
+        log.error(f'Columna no encontrada: {e}')
+        return None
+    except Exception as e:
+        log.error(f'Error en create_dim_ship')
+        return None
     
     return df_ship
 
 # TODO: Crear dimension de fecha
+def create_dim_dates(df):
+    try:
+        # ? Objetivo: Crear tabla con fechas unicas del dataset
+
+        # -- Seleccionar columnas
+        df_dates = df[['Order Date', 'Ship_Date']]
+
+        # -- Eliminar filas duplicadas
+        df_dates = df_dates.drop_duplicates()
+
+    except KeyError as e:
+        log.error(f'Columna no encontrada: {e}')
+    except Exception as e:
+        log.error(f'Error en create_dim_dates')
+    
+    return df_dates
 # TODO: Crear dimension de fact_sales

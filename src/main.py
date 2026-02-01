@@ -60,12 +60,15 @@ def run_app():
     print('\nDIMENSION DE ENVIO\n')
     dim_ship = create_dim_ship(df_retail)
     # Validar resultados
-    print(f"\n Total envios únicos: {len(dim_ship)}")
-    print(f" Columnas: {dim_ship.columns.tolist()}")
-    print(f"\n Primeras 5 filas:\n{dim_ship.head()}")
-    print(f"\n Últimas 5 filas:\n{dim_ship.tail()}")
-    print(f"\n Hay nulos?: {dim_ship.isnull().sum().sum()}")
-
+    print(f"Total modos: {len(dim_ship)}")  
+    print(f"Nulos: {dim_ship.isnull().sum().sum()}")  
+    print(f"Duplicados: {dim_ship.duplicated().sum()}")
+    print(f"ship_mode_key únicos: {dim_ship['ship_mode_key'].is_unique}") 
+    print(f"Rango: {dim_ship['ship_mode_key'].min()} a {dim_ship['ship_mode_key'].max()}")  
+    print(f"Modos únicos: {sorted(dim_ship['Ship Mode'].unique())}")
+    print(f"Columnas: {dim_ship.columns.tolist()}")
+    print(f"Tipos:\n{dim_ship.dtypes}")
+    print(f"\nTabla completa:\n{dim_ship}")
 
 
 
