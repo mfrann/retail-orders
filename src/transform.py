@@ -27,19 +27,15 @@ def change_datatype(df):
 def create_dim_products(df):
     # -- Seleccionar las columnas
     df_products = df[['Product ID', 'Product Name', 'Category', 'Sub-Category']]
-    print('Columnas seleccionadas')
 
     # -- Eliminar filas duplicadas
     df_products = df_products.drop_duplicates()
-    print('Filas duplicadas eliminadas')
 
     # -- Resetar el indice 
     df_products = df_products.reset_index(drop=True)
-    print('Indice Reseteado')
 
     # -- Crear nueva columna product_key
     df_products['product_key'] = range(len(df_products)) # -> Crea la columna nueva y añade los indices. 
-    print('Nueva columna creada')
 
     # -- Reordenar columnas
     df_products = df_products[['product_key', 'Product ID', 'Product Name', 'Category', 'Sub-Category']]
@@ -53,19 +49,15 @@ def create_dim_customers(df):
 
     # -- Seleccionar las columnas
     df_customers = df[['Customer ID', 'Customer Name', 'Segment']]
-    print('Columnas seleccionadas')
 
     # -- Eliminar filas duplicadas 
     df_customers = df_customers.drop_duplicates(subset=['Customer ID']) # -> No es necesario, pero se evita un error.
-    print('Filas duplicadas eliminadas')
 
     # -- Resetear indice
     df_customers = df_customers.reset_index(drop=True)
-    print('Indice Reseteado')
 
     # -- Crear columna 'customer_key'
     df_customers['customer_key'] = range(len(df_customers))
-    print('Nueva columna creada')
 
     # -- Reordenar columnas
     df_customers = df_customers[['customer_key', 'Customer ID', 'Customer Name', 'Segment']]
@@ -79,19 +71,15 @@ def create_dim_locations(df):
 
     # -- Seleccionar las columnas 
     df_locations = df[['Country', 'Region', 'State', 'City', 'Postal Code']]
-    print('Columnas seleccionadas')
 
     # -- Eliminar filas duplicadas
     df_locations = df_locations.drop_duplicates()
-    print('Filas duplicadas eliminadas')
 
     # -- Resetear indice
     df_locations = df_locations.reset_index(drop=True)
-    print('Indice Reseteado')
 
     # -- Crear columna 'customer_key'
     df_locations['location_key'] = range(len(df_locations))
-    print('Nueva columna creada')
 
     # -- Reordenar columnas
     df_locations = df_locations[['location_key', 'Country', 'Region', 'State', 'City', 'Postal Code']]
@@ -99,5 +87,30 @@ def create_dim_locations(df):
     return df_locations
 
 # TODO: Crear dimension de modo de envio
+def create_dim_ship(df):
+    try:
+
+        #? -- Objetivo: Crear una tabla con los envios unicos del dataset.
+
+        # -- Seleccionar las columnas
+        df_ship = df[['Ship Mode']]
+
+        # -- Eliminar filas duplicadas
+        df_ship = df_ship.drop_duplicates()
+
+        # -- Resetear indice
+        df_ship = df_ship.reset_index(drop=True)
+
+        # -- Crear columna  'ship_mode_key'
+        df_ship['ship_mode_key'] = range(len(df_ship))
+
+        # -- Reordenar columnas 
+        df_ship = df_ship[['ship_mode_key', 'Ship Mode']]
+    except FileNotFoundError as e:
+        print(f'Hubo un error: {e}')
+        return False
+    
+    return df_ship
+
 # TODO: Crear dimension de fecha
 # TODO: Crear dimension de fact_sales

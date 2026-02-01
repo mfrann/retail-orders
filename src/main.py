@@ -4,7 +4,8 @@ from transform import (
     change_datatype,
     create_dim_products,
     create_dim_customers, 
-    create_dim_locations
+    create_dim_locations,
+    create_dim_ship
 )
 #===============#
 
@@ -55,6 +56,20 @@ def run_app():
     print(f'\n Combinaciones City+State+Postal únicas: {dim_locations[['City', 'State', 'Postal Code']].duplicated().sum()}')
 
     
+    # - Crear dimension de envio
+    print('\nDIMENSION DE ENVIO\n')
+    dim_ship = create_dim_ship(df_retail)
+    # Validar resultados
+    print(f"\n Total envios únicos: {len(dim_ship)}")
+    print(f" Columnas: {dim_ship.columns.tolist()}")
+    print(f"\n Primeras 5 filas:\n{dim_ship.head()}")
+    print(f"\n Últimas 5 filas:\n{dim_ship.tail()}")
+    print(f"\n Hay nulos?: {dim_ship.isnull().sum().sum()}")
+
+
+
+
+
 
     return df_retail
 
