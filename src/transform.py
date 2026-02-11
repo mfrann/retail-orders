@@ -147,21 +147,54 @@ def create_dim_ship(df):
     
     return df_ship
 
-# TODO: Crear dimension de fecha
+# TODO: Crear dimension de fecha -- POR TERMINAR
 def create_dim_dates(df):
     try:
         # ? Objetivo: Crear tabla con fechas unicas del dataset
 
-        # -- Seleccionar columnas
-        df_dates = df[['Order Date', 'Ship_Date']]
+        log.info("Creando dimensión de fechas...")
+        # -- Extraer columnas
+        order_date = df['Order Date']
+        ship_date = df['Ship Date']
 
-        # -- Eliminar filas duplicadas
-        df_dates = df_dates.drop_duplicates()
+        # -- Concatenar las columnas
+        df_dates = pd.concat([order_date, ship_date], ignore_index=True)
 
+        # -- Fechas unicas 
+        unique_dates = df_dates.unique()
+
+        # -- Ordenar 
+        unique_dates.sort()
+
+        # -- Crear DataFrame
+        df_dates = pd.DataFrame(unique_dates, columns=['date'])
+
+        # -- Resetear index
+        df_dates = df_dates.reset_index(drop=True)
+
+        # -- Extraer componentes de fecha
+
+        df_dates['date_key'] = range(len(df_dates))
+        df_dates['year'] = df_dates['date'].dt.year
+        df_dates['quarter'] = df_dates['date'].dt.quarter
+        df_dates['month'] = df_dates['date'].dt.month
+        df_dates['month_name'] = df_dates['date'].dt.month_name()
+        df_dates['day'] = df_dates['date'].dt.day
+        df_dates['day_of_week'] = df_dates['date'].dt.dayofweek
+        df_dates['day_name'] = df_dates['date'].dt.day_name()
+        df_dates['week_of_year'] = df_dates['date'].dt.isocalendar().week
+
+        # -- Reordenar columnas
+        df_dates = df_dates[['date_key', 'date', 'year', 'quarter', 'month', 'month_name', 'day', 'day_of_week', 'day_name', 'week_of_year']]
+
+        log.info(f"Dimensión de fechas creada: {len(df_dates)} fechas únicas")
+        return df_dates
     except KeyError as e:
         log.error(f'Columna no encontrada: {e}')
+        return None
     except Exception as e:
-        log.error(f'Error en create_dim_dates')
-    
-    return df_dates
+        log.error(f'Error en create_dim_dates: {e}')
+        return None
+
+        
 # TODO: Crear dimension de fact_sales

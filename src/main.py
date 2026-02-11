@@ -12,7 +12,7 @@ from transform import (
 def run_app():
 
     # -- EXTRAER EL DATAFRAME
-    print("\nExtrayendo dataframe deel archivo superstore.csv...\n")
+    print("\nExtrayendo dataframe del archivo superstore.csv...\n")
     
     df_retail = extract_csv()
 
@@ -69,6 +69,7 @@ def run_app():
     print(f"Columnas: {dim_ship.columns.tolist()}")
     print(f"Tipos:\n{dim_ship.dtypes}")
     print(f"\nTabla completa:\n{dim_ship}")
+
 
 
 
