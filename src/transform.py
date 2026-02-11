@@ -164,7 +164,7 @@ def create_dim_dates(df):
         unique_dates = df_dates.unique()
 
         # -- Ordenar 
-        unique_dates.sort()
+        unique_dates = pd.Series(unique_dates).sort_values()
 
         # -- Crear DataFrame
         df_dates = pd.DataFrame(unique_dates, columns=['date'])
@@ -196,5 +196,5 @@ def create_dim_dates(df):
         log.error(f'Error en create_dim_dates: {e}')
         return None
 
-        
+
 # TODO: Crear dimension de fact_sales
