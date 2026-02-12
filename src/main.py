@@ -9,6 +9,8 @@ from transform import (
     create_dim_dates,
     create_fact_sales
 )
+
+from load import load_db
 #===============#
 
 def run_app():
@@ -101,7 +103,7 @@ def run_app():
     print(f"Columnas: {dim_dates.columns.tolist()}")
 
 
-
+    #Dict de dimensiones para facilitar creación de tabla de hechos
     dimensions = {
         'products': dim_products,
         'customers': dim_customers,
@@ -109,6 +111,7 @@ def run_app():
         'dates': dim_dates,
         'ship_modes': dim_ship
     }
+
     print('\nCREANDO TABLA DE HECHOS DE VENTAS\n')
     fact_sales = create_fact_sales(df_retail, dimensions)
 
@@ -117,6 +120,10 @@ def run_app():
         return None
     print(f'\n Primeras 5 filas:\n{fact_sales.head()}')
     
+    # - Cargar datos a la base de datos
+    print('\nCARGANDO DATOS EN LA BASE DE DATOS...\n')
+
+    load_db(dimensions, fact_sales)
     
     
 
