@@ -6,7 +6,8 @@ from transform import (
     create_dim_customers, 
     create_dim_locations,
     create_dim_ship,
-    create_dim_dates
+    create_dim_dates,
+    create_fact_sales
 )
 #===============#
 
@@ -86,19 +87,29 @@ def run_app():
 
     # - Crear dimension de date
     print('\nDIMENSION DE FECHA\n')
-    dim_date = create_dim_dates(df_retail)
-    if dim_date is None:
-        print("Pipeline detenido: dim_date falló")
+    dim_dates = create_dim_dates(df_retail)
+    if dim_dates is None:
+        print("Pipeline detenido: dim_dates falló")
         return None
     # Validar resultados
-    print(f"Total fechas únicas: {len(dim_date)}")
-    print(f"Nulos: {dim_date.isnull().sum().sum()}")
-    print(f"Duplicados: {dim_date.duplicated().sum()}")
-    print(f"date_key únicos: {dim_date['date_key'].is_unique}")
-    print(f"Rango: {dim_date['date_key'].min()} a {dim_date['date_key'].max()}")
-    print(f"Columnas: {dim_date.columns.tolist()}")
+    print(f"\n Primeras 5 filas:\n{dim_dates.head()}")
+    print(f"Total fechas únicas: {len(dim_dates)}")
+    print(f"Nulos: {dim_dates.isnull().sum().sum()}")
+    print(f"Duplicados: {dim_dates.duplicated().sum()}")
+    print(f"date_key únicos: {dim_dates['date_key'].is_unique}")
+    print(f"Rango: {dim_dates['date_key'].min()} a {dim_dates['date_key'].max()}")
+    print(f"Columnas: {dim_dates.columns.tolist()}")
 
 
+
+    dimensions = {
+        'products': dim_products,
+        'customers': dim_customers,
+        'locations': dim_locations,
+        'dates': dim_dates,
+        'ship_modes': dim_ship
+    }
+    create_fact_sales(df_retail, dimensions)
     
     
     

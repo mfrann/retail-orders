@@ -147,7 +147,7 @@ def create_dim_ship(df):
     
     return df_ship
 
-# TODO: Crear dimension de fecha -- POR TERMINAR
+# TODO: Crear dimension de fecha
 def create_dim_dates(df):
     try:
         # ? Objetivo: Crear tabla con fechas unicas del dataset
@@ -198,3 +198,70 @@ def create_dim_dates(df):
 
 
 # TODO: Crear dimension de fact_sales
+
+def create_fact_sales(df, dimensions):
+    """
+    dimensions: dict con las dimensiones creadas (dim_customers, dim_locations, dim_ship, dim_dates, dim_products)
+    """
+
+
+    try:
+        log.info("Creando tabla de hechos de ventas...")
+
+        # -- Copiar el dataframe
+        fact_sales = df.copy() # -> Copiamos el dataframe original, asi no afectamos a las dimensiones creadas. 
+
+        # -- Crear sale_key
+        fact_sales['sale_key'] = range(len(fact_sales))
+
+        # -- Merge con dimensiones 
+        fact_sales = fact_sales.merge(
+            dimensions['products'][['product_key', 'Product ID']],
+            on='Product ID',
+            how='left'
+        )
+
+        fact_sales = fact_sales.merge(
+            dimensions['customers'][['customer_key', 'Customer ID']],
+            on='Customer ID',
+            how='left'
+        )
+
+        fact_sales = fact_sales.merge(
+            dimensions['locations'][['location_key', 'Country', 'Region', 'State', 'City', 'Postal Code']],
+            on=['Country', 'Region', 'State', 'City', 'Postal Code'],
+            how='left'
+        )
+
+        fact_sales = fact_sales.merge(
+            dimensions['ship_modes'][['ship_mode_key', 'Ship_mode']],
+            on='Ship Mode',
+            how='left'
+        )
+
+        fact_sales = fact_sales.merge(
+            dimensions['dates'][['date_key', 'date']],
+            left_on='Order Date',
+            right_on='date',
+            how='left'
+        )
+
+        # -- Seleccionar columnas 
+        fact_sales = fact_sales[['sale_key', 'product_key', 'customer_key', 'location_key', 'ship_mode_key', 'date_key']]
+
+        # -- Renombrar columnas 
+        fact_sales = fact_sales.rename(columns={
+            'Order ID': 'order_id',
+            'Sales': 'sales_amount',
+            'Quantity': 'quantity',
+            'Discount': 'discount',
+            'Profit': 'profit',
+        })
+
+        # -- Validar 
+        log.info(f"Tabla de hechos de ventas creada: {len(fact_sales)} filas")
+        
+        return fact_sales
+    except Exception as e:
+        log.error(f"Error al crear tabla de hechos de ventas: {e}")
+        return None
