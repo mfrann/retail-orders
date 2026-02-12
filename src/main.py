@@ -115,6 +115,7 @@ def run_app():
     if fact_sales is None:
         print('Pipeline detenido: fact_sales falló')
         return None
+    print(f'\n Primeras 5 filas:\n{fact_sales.head()}')
     
     
     

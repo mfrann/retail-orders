@@ -198,70 +198,135 @@ def create_dim_dates(df):
 
 
 # TODO: Crear dimension de fact_sales
-
 def create_fact_sales(df, dimensions):
     """
-    dimensions: dict con las dimensiones creadas (dim_customers, dim_locations, dim_ship, dim_dates, dim_products)
+    dimensions: dict con las dimensiones creadas
+    {
+        'products': dim_products,
+        'customers': dim_customers,
+        'locations': dim_locations,
+        'dates': dim_dates,
+        'ship_modes': dim_ship_modes
+    }
     """
-
-
     try:
         log.info("Creando tabla de hechos de ventas...")
 
         # -- Copiar el dataframe
-        fact_sales = df.copy() # -> Copiamos el dataframe original, asi no afectamos a las dimensiones creadas. 
+        fact_sales = df.copy()
 
         # -- Crear sale_key
         fact_sales['sale_key'] = range(len(fact_sales))
 
-        # -- Merge con dimensiones 
+        # -- MERGE 1: Products
         fact_sales = fact_sales.merge(
             dimensions['products'][['product_key', 'Product ID']],
             on='Product ID',
             how='left'
         )
+        log.debug("Merge con dim_products completado")
 
+        # -- MERGE 2: Customers
         fact_sales = fact_sales.merge(
             dimensions['customers'][['customer_key', 'Customer ID']],
             on='Customer ID',
             how='left'
         )
+        log.debug("Merge con dim_customers completado")
 
+        # -- MERGE 3: Locations (múltiples columnas)
         fact_sales = fact_sales.merge(
             dimensions['locations'][['location_key', 'Country', 'Region', 'State', 'City', 'Postal Code']],
             on=['Country', 'Region', 'State', 'City', 'Postal Code'],
             how='left'
         )
+        log.debug("Merge con dim_locations completado")
 
+        # -- MERGE 4: Ship Modes
         fact_sales = fact_sales.merge(
             dimensions['ship_modes'][['ship_mode_key', 'Ship Mode']],
             on='Ship Mode',
             how='left'
         )
+        log.debug("Merge con dim_ship_modes completado")
 
+        # -- MERGE 5: Order Date
         fact_sales = fact_sales.merge(
             dimensions['dates'][['date_key', 'date']],
             left_on='Order Date',
             right_on='date',
             how='left'
-        )
+        ).rename(columns={'date_key': 'order_date_key'})  # ✅ Renombrar inmediatamente
+        fact_sales = fact_sales.drop('date', axis=1)  # ✅ Eliminar columna 'date' duplicada
+        log.debug("Merge con dim_dates (Order Date) completado")
 
-        # -- Seleccionar columnas 
-        fact_sales = fact_sales[['sale_key', 'product_key', 'customer_key', 'location_key', 'ship_mode_key', 'date_key']]
+        # -- MERGE 6: Ship Date
+        fact_sales = fact_sales.merge(
+            dimensions['dates'][['date_key', 'date']],
+            left_on='Ship Date',
+            right_on='date',
+            how='left'
+        ).rename(columns={'date_key': 'ship_date_key'})  # ✅ Renombrar inmediatamente
+        fact_sales = fact_sales.drop('date', axis=1)  # ✅ Eliminar columna 'date' duplicada
+        log.debug("Merge con dim_dates (Ship Date) completado")
 
-        # -- Renombrar columnas 
+        # -- Seleccionar columnas finales
+        fact_sales = fact_sales[[
+            'sale_key',
+            'Row ID',
+            'Order ID',
+            
+            # Foreign Keys
+            'product_key',
+            'customer_key',
+            'location_key',
+            'order_date_key',
+            'ship_date_key',
+            'ship_mode_key',
+            
+            # Métricas
+            'Sales',
+            'Quantity',
+            'Discount',
+            'Profit'
+        ]]
+
+        # -- Renombrar columnas a minúsculas/snake_case
         fact_sales = fact_sales.rename(columns={
+            'Row ID': 'row_id',
             'Order ID': 'order_id',
-            'Sales': 'sales_amount',
+            'Sales': 'sales',
             'Quantity': 'quantity',
             'Discount': 'discount',
-            'Profit': 'profit',
+            'Profit': 'profit'
         })
 
-        # -- Validar 
-        log.info(f"Tabla de hechos de ventas creada: {len(fact_sales)} filas")
-
+        # -- VALIDACIONES CRÍTICAS
+        # 1. Verificar cantidad de filas
+        if len(fact_sales) != len(df):
+            log.error(f"⚠️ ALERTA: fact_sales tiene {len(fact_sales)} filas, pero el CSV original tiene {len(df)}")
+        
+        # 2. Verificar nulos en foreign keys (CRÍTICO)
+        fk_columns = ['product_key', 'customer_key', 'location_key', 'order_date_key', 'ship_date_key', 'ship_mode_key']
+        null_counts = fact_sales[fk_columns].isnull().sum()
+        
+        if null_counts.sum() > 0:
+            log.error("❌ CRÍTICO: Hay valores nulos en foreign keys:")
+            log.error(null_counts[null_counts > 0])
+            log.error("Esto indica que el merge falló para algunos registros")
+        else:
+            log.info("✅ Validación: Cero nulos en foreign keys")
+        
+        # 3. Verificar nulos en métricas
+        metric_nulls = fact_sales[['sales', 'quantity', 'discount', 'profit']].isnull().sum()
+        if metric_nulls.sum() > 0:
+            log.warning(f"⚠️ Hay nulos en métricas: {metric_nulls[metric_nulls > 0]}")
+        
+        log.info(f"✅ Tabla de hechos creada: {len(fact_sales)} filas")
         return fact_sales
+        
     except Exception as e:
-        log.error(f"Error al crear tabla de hechos de ventas: {e}")
+        log.error(f"❌ Error al crear fact_sales: {e}")
+        import traceback
+        log.error(traceback.format_exc())
         return None
