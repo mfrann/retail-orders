@@ -109,7 +109,12 @@ def run_app():
         'dates': dim_dates,
         'ship_modes': dim_ship
     }
-    create_fact_sales(df_retail, dimensions)
+    print('\nCREANDO TABLA DE HECHOS DE VENTAS\n')
+    fact_sales = create_fact_sales(df_retail, dimensions)
+
+    if fact_sales is None:
+        print('Pipeline detenido: fact_sales falló')
+        return None
     
     
     

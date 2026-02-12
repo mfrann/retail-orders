@@ -234,7 +234,7 @@ def create_fact_sales(df, dimensions):
         )
 
         fact_sales = fact_sales.merge(
-            dimensions['ship_modes'][['ship_mode_key', 'Ship_mode']],
+            dimensions['ship_modes'][['ship_mode_key', 'Ship Mode']],
             on='Ship Mode',
             how='left'
         )
@@ -260,7 +260,7 @@ def create_fact_sales(df, dimensions):
 
         # -- Validar 
         log.info(f"Tabla de hechos de ventas creada: {len(fact_sales)} filas")
-        
+
         return fact_sales
     except Exception as e:
         log.error(f"Error al crear tabla de hechos de ventas: {e}")
