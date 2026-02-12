@@ -132,14 +132,11 @@ def run_app():
     save_to_csv(dim_dates, 'dim_dates.csv')
     save_to_csv(fact_sales, 'fact_sales.csv')
 
-    """
-
     # - Cargar datos a la base de datos
     print('\nCARGANDO DATOS EN LA BASE DE DATOS...\n')
-
     load_db(dimensions, fact_sales)
     
-    """
+
 
 
 

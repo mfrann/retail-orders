@@ -1,16 +1,17 @@
+from importlib.resources import path
 import sqlite3 
 from pathlib import Path
 import logging as log
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROCESS_DIR = BASE_DIR / "data" / "processed"
-
+DATA_DIR = BASE_DIR / "data" / "database"
 
 def load_db(dimensions, fact_sales):
 
     try: 
 
-        db_path = Path(__file__).parent / 'data' / 'database' / 'superstore.db'
+        db_path = DATA_DIR / "superstore.db"
 
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -29,10 +30,13 @@ def load_db(dimensions, fact_sales):
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_product_key ON fact_sales(product_key)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_customer_key ON fact_sales(customer_key)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_location_key ON fact_sales(location_key)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_date_key ON fact_sales(date_key)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_order_date_key ON fact_sales(order_date_key)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ship_date_key ON fact_sales(ship_date_key)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_ship_mode_key ON fact_sales(ship_mode_key)")
         conn.commit()
 
+        print(f"✓ Base de datos actualizada: {db_path}")
+        
     except Exception as e:
         log.error(f"Error al cargar datos en la base de datos: {e}")
         return None
