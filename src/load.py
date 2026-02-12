@@ -2,11 +2,15 @@ import sqlite3
 from pathlib import Path
 import logging as log
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+PROCESS_DIR = BASE_DIR / "data" / "processed"
+
+
 def load_db(dimensions, fact_sales):
 
     try: 
 
-        db_path = Path(__file__).parent / 'data' / 'superstore.db'
+        db_path = Path(__file__).parent / 'data' / 'database' / 'superstore.db'
 
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -32,3 +36,12 @@ def load_db(dimensions, fact_sales):
     except Exception as e:
         log.error(f"Error al cargar datos en la base de datos: {e}")
         return None
+
+
+def save_to_csv(df, filename):
+    PROCESS_DIR.mkdir(exist_ok=True)
+
+    path = PROCESS_DIR / filename
+    df.to_csv(path, index=False)
+
+    print(f"✓ Archivo guardado: {path}")

@@ -10,7 +10,10 @@ from transform import (
     create_fact_sales
 )
 
-from load import load_db
+from load import (
+    load_db, 
+    save_to_csv
+)
 #===============#
 
 def run_app():
@@ -120,12 +123,26 @@ def run_app():
         return None
     print(f'\n Primeras 5 filas:\n{fact_sales.head()}')
     
+
+    # - Guardar archivos csv ya procesados
+    save_to_csv(dim_products, 'dim_products.csv')
+    save_to_csv(dim_customers, 'dim_customers.csv')
+    save_to_csv(dim_locations, 'dim_locations.csv')
+    save_to_csv(dim_ship, 'dim_ship_modes.csv')
+    save_to_csv(dim_dates, 'dim_dates.csv')
+    save_to_csv(fact_sales, 'fact_sales.csv')
+
+    """
+
     # - Cargar datos a la base de datos
     print('\nCARGANDO DATOS EN LA BASE DE DATOS...\n')
 
     load_db(dimensions, fact_sales)
     
-    
+    """
+
+
+
 
     return df_retail
 run_app()
